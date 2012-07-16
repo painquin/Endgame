@@ -3,6 +3,7 @@ package net.minecraft.src;
 import net.minecraft.src.ic2.api.*;
 import net.minecraft.src.forge.*;
 import java.util.Random;
+import java.lang.reflect.*;
 
 public class mod_Endgame extends NetworkMod
 {
@@ -36,6 +37,10 @@ public class mod_Endgame extends NetworkMod
 	
 	public void load()
 	{
+	
+		DisableNetherPortals();
+		
+		//todo: combine into a single item, use meta info to distinguish
 		NegastoneDust = new Item(20000).setItemName("negastone.dust");
 		NegastoneDust.iconIndex = ModLoader.addOverride("/gui/items.png", "Endgame/dust.png");
 		ModLoader.addName(NegastoneDust, "Negastone Dust");
@@ -50,6 +55,7 @@ public class mod_Endgame extends NetworkMod
 		
 		ModLoader.addSmelting(SuperconductorDust.shiftedIndex, new ItemStack(SuperconductorIngot, 1));
 		
+		// todo: combine into a single block, use meta info to distinguish
 		NegastoneOre = new Block(180, Material.rock)
 		{
 			/**
@@ -99,6 +105,33 @@ public class mod_Endgame extends NetworkMod
 		ModLoader.addName(NegastoneOre_Nether, "Negastone Ore");
 		ModLoader.registerBlock(NegastoneOre_Nether);
 		
+	}
+	
+	public void DisableNetherPortals()
+	{
+		try{
+			Class block = Class.forName("net.minecraft.src.Block");
+			Field blockportal = block.getField("portal");
+			
+			Field modifiersField = Field.class.getDeclaredField("modifiers"); // this is actually reflection ON the Field class.
+			modifiersField.setAccessible(true);
+			int modifiers = modifiersField.getInt(blockportal);
+			modifiers &= ~Modifier.FINAL;
+			modifiersField.setInt(blockportal, modifiers);
+			blockportal.set(null, new BlockPortal(181, 14)
+			{
+				@Override
+				public boolean tryToCreatePortal(World par1World, int par2, int par3, int par4)
+				{
+					return false;
+				}
+			});
+
+		}
+		catch(Exception e)
+		{
+			System.out.println(e);
+		}
 	}
 	
 	
