@@ -14,9 +14,8 @@ public class mod_Endgame extends NetworkMod
 	public static Item SuperconductorDust;
 	public static Item SuperconductorIngot;
 	
-	public static Block GateFrame;
-	public static Block Dialer;
-	public static Block ProtoDialer;
+	public static BlockGate Gate;
+	public static BlockDialer Dialer;
 	
 	@Override
 	public boolean clientSideRequired()
@@ -54,6 +53,26 @@ public class mod_Endgame extends NetworkMod
 		ModLoader.addName(SuperconductorIngot, "Superconductor Ingot");
 		
 		ModLoader.addSmelting(SuperconductorDust.shiftedIndex, new ItemStack(SuperconductorIngot, 1));
+		
+		
+		Gate = new BlockGate(182);
+		Gate.setBlockName("endgame.gate")
+			.setHardness(3F)
+			.setResistance(25f)
+			.blockIndexInTexture = ModLoader.addOverride("/terrain.png", "Endgame/gate.png");
+		
+		ModLoader.addName(Gate, "Gate");
+		ModLoader.registerBlock(Gate);
+		
+		Dialer = new BlockDialer(183);
+		
+		Dialer.setBlockName("endgame.dialer")
+			.setHardness(3F)
+			.setResistance(15f)
+			.blockIndexInTexture = ModLoader.addOverride("/terrain.png", "Endgame/dialer.png");
+		ModLoader.addName(Dialer, "Dialer");
+		ModLoader.registerBlock(Dialer);
+		
 		
 		// todo: combine into a single block, use meta info to distinguish
 		NegastoneOre = new Block(180, Material.rock)
@@ -118,7 +137,7 @@ public class mod_Endgame extends NetworkMod
 			int modifiers = modifiersField.getInt(blockportal);
 			modifiers &= ~Modifier.FINAL;
 			modifiersField.setInt(blockportal, modifiers);
-			blockportal.set(null, new BlockPortal(181, 14)
+			blockportal.set(null, new BlockPortal(179, 14)
 			{
 				@Override
 				public boolean tryToCreatePortal(World par1World, int par2, int par3, int par4)
@@ -203,12 +222,31 @@ public class mod_Endgame extends NetworkMod
 			new Object[] { NegastoneDust, Items.getItem("goldDust").getItem() }
 		);
 
+		ModLoader.addRecipe(new ItemStack(Dialer, 1),
+			new Object[] {
+				"ESE", "SCS", "ESE",
+				'E', Items.getItem("energyCrystal"),
+				'S', SuperconductorIngot,
+				'C', Items.getItem("electronicCircuit")
+			}
+		);
+		
+		ModLoader.addRecipe(new ItemStack(Gate, 1),
+			new Object[] {
+				"ISI", "SCS", "ISI",
+				'I', Item.ingotIron,
+				'S', SuperconductorIngot,
+				'C', Items.getItem("electronicCircuit")
+			}
+		);
+		
 		Ic2Recipes.addMaceratorRecipe(new ItemStack(NegastoneOre_Nether), new ItemStack(NegastoneDust, 2));
 		
 		// 8x charcoal to get a coal dust
 		Ic2Recipes.addMaceratorRecipe(new ItemStack(Item.coal, 8, 1), Items.getItem("coalDust"));
 		// compress netherrack into netherbricks - 4 resulted in 3 being used
 		Ic2Recipes.addCompressorRecipe(new ItemStack(Block.netherrack, 5), new ItemStack(Block.netherBrick, 1));
+		
 	}
 	
 	public String getVersion()
