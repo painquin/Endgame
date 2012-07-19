@@ -6,4 +6,5 @@ public class BlockDialer extends Block
 	{
 		super(id, Material.rock);
 	}
+
 }
