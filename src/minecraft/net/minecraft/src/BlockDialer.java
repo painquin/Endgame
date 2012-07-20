@@ -31,7 +31,5 @@ public class BlockDialer extends BlockContainer
     {
 		return new TileEntityDialer();
     }
-	
-	
-	
+
 }
