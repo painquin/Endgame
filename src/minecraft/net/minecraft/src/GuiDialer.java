@@ -2,12 +2,13 @@ package net.minecraft.src;
 
 import org.lwjgl.opengl.GL11;
 
-public class GuiDialer extends GuiScreen
+public class GuiDialer extends GuiContainer
 {
     private TileEntityDialer dialer;
 	
-	public GuiDialer(TileEntityDialer par2dialer)
+	public GuiDialer(InventoryPlayer par1InventoryPlayer, TileEntityDialer par2dialer)
     {
+		super(new ContainerDialer(par1InventoryPlayer, par2dialer));
         this.dialer = par2dialer;
     }
 	
@@ -98,11 +99,18 @@ public class GuiDialer extends GuiScreen
 	
 	}
 	
-	
-	public void drawScreen(int par1, int par2, float par3)
-	{
-		drawDefaultBackground();
-		
+	/**
+     * Draw the foreground layer for the GuiContainer (everythin in front of the items)
+     */
+    protected void drawGuiContainerForegroundLayer()
+    {
+    }
+
+    /**
+     * Draw the background layer for the GuiContainer (everything behind the items)
+     */
+    protected void drawGuiContainerBackgroundLayer(float par1, int par2, int par3)
+    {	
 		int tex = mc.renderEngine.getTexture("/Endgame/dialer-ui.png");
 		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
 		
@@ -130,7 +138,5 @@ public class GuiDialer extends GuiScreen
 		}
 		
 		GL11.glDisable(GL11.GL_BLEND);
-		
-		super.drawScreen(par1, par2, par3);
-	}
+    }
 }

@@ -5,8 +5,10 @@ import net.minecraft.src.forge.*;
 import java.util.Random;
 import java.lang.reflect.*;
 
-public class mod_Endgame extends NetworkMod
+public class mod_Endgame extends NetworkMod implements IGuiHandler
 {
+	public static mod_Endgame Instance;
+
 	public static Block NegastoneOre;
 	public static Block NegastoneOre_Nether;
 	
@@ -20,22 +22,24 @@ public class mod_Endgame extends NetworkMod
 	@Override
 	public boolean clientSideRequired()
 	{
-			return true;
+		return true;
 	}
 
 	@Override
 	public boolean serverSideRequired()
 	{
-			return false;
+		return false;
 	}
 		
 	public mod_Endgame()
 	{
-	
+		Instance = this;
 	}
 	
 	public void load()
 	{
+	
+		MinecraftForge.setGuiHandler(this, this);
 	
 		DisableNetherPortals();
 		
@@ -59,7 +63,7 @@ public class mod_Endgame extends NetworkMod
 		Gate.setBlockName("endgame.gate")
 			.setHardness(3F)
 			.setResistance(25f)
-			.blockIndexInTexture = ModLoader.addOverride("/terrain.png", "Endgame/gate.png");
+			.blockIndexInTexture = ModLoader.addOverride("/terrain.png", "Endgame/gate-off.png");
 		
 		ModLoader.addName(Gate, "Gate");
 		ModLoader.registerBlock(Gate);
@@ -123,6 +127,8 @@ public class mod_Endgame extends NetworkMod
 		MinecraftForge.setBlockHarvestLevel(NegastoneOre_Nether, "pickaxe", 1);
 		ModLoader.addName(NegastoneOre_Nether, "Negastone Ore");
 		ModLoader.registerBlock(NegastoneOre_Nether);
+		
+		ModLoader.registerTileEntity(TileEntityDialer.class, "Dialer");
 		
 	}
 	
@@ -252,5 +258,15 @@ public class mod_Endgame extends NetworkMod
 	public String getVersion()
 	{
 		return "0.1";
+	}
+	
+	public Object getGuiElement(int Id, EntityPlayer player, World world, int x, int y, int z)
+	{
+		System.out.println("Dialer GUI: " + player);
+		switch(Id)
+		{
+			case 1: return new ContainerDialer(	player.inventory, (TileEntityDialer)world.getBlockTileEntity(x, y, z));
+		}
+		return null;
 	}
 }

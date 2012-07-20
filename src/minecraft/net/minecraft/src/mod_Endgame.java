@@ -264,7 +264,7 @@ public class mod_Endgame extends NetworkMod implements IGuiHandler
 	{
 		switch(Id)
 		{
-			case 1: return new GuiDialer((TileEntityDialer)world.getBlockTileEntity(x, y, z));
+			case 1: return new GuiDialer(player.inventory, (TileEntityDialer)world.getBlockTileEntity(x, y, z));
 		}
 		return null;
 	}
