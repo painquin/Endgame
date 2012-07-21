@@ -5,7 +5,9 @@ import net.minecraft.src.forge.*;
 import java.util.Random;
 import java.lang.reflect.*;
 
-public class mod_Endgame extends NetworkMod implements IGuiHandler
+import java.io.*;
+
+public class mod_Endgame extends NetworkMod implements IGuiHandler, IConnectionHandler, IPacketHandler
 {
 	public static mod_Endgame Instance;
 
@@ -244,4 +246,53 @@ public class mod_Endgame extends NetworkMod implements IGuiHandler
 		}
 		return null;
 	}
+	
+	@Override
+	public void onConnect(NetworkManager network)
+	{
+	}
+
+	@Override
+	public void onLogin(NetworkManager network, Packet1Login login)
+	{
+			MessageManager.getInstance().registerChannel(network, this, "endgame.dialer");
+	}
+
+	@Override
+	public void onDisconnect(NetworkManager network, String message, Object[] args)
+	{
+	}
+	
+	@Override
+	public void onPacketData(NetworkManager network, String channel, byte[] data)
+	{
+		// if (channel.equals("endgame.dialer"))
+		// {
+			
+			// int w, x, y, z;
+			// String d;
+			
+			// DataInputStream ds = new DataInputStream(new ByteArrayInputStream(data));
+			// try
+			// {
+				// w = ds.readInt();
+				// x = ds.readInt();
+				// y = ds.readInt();
+				// z = ds.readInt();
+				// d = ds.readString();
+				
+				// World worldObj = 
+				
+				// TileEntity ent = worldObj.getBlockTileEntity(x, y, z);
+				// if (ent == null || !(ent instanceof TileEntityDialer)) return;
+				
+				// ((TileEntityDialer)ent).setDisplay(d);
+			// }
+			// catch(Exception e)
+			// {
+				// e.printStackTrace();
+			// }
+		// }
+	}
+	
 }

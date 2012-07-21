@@ -4,8 +4,9 @@ import net.minecraft.src.ic2.api.*;
 import net.minecraft.src.forge.*;
 import java.util.Random;
 import java.lang.reflect.*;
+import java.io.*;
 
-public class mod_Endgame extends NetworkMod implements IGuiHandler
+public class mod_Endgame extends NetworkMod implements IGuiHandler, IConnectionHandler, IPacketHandler
 {
 	public static mod_Endgame Instance;
 
@@ -37,6 +38,8 @@ public class mod_Endgame extends NetworkMod implements IGuiHandler
 	public void load()
 	{
 	
+		MinecraftForge.registerConnectionHandler(this);
+		
 		MinecraftForge.setGuiHandler(this, this);
 	
 		DisableNetherPortals();
@@ -236,11 +239,78 @@ public class mod_Endgame extends NetworkMod implements IGuiHandler
 	
 	public Object getGuiElement(int Id, EntityPlayer player, World world, int x, int y, int z)
 	{
-		System.out.println("Dialer GUI: " + player);
 		switch(Id)
 		{
 			case 1: return new ContainerDialer(	player.inventory, (TileEntityDialer)world.getBlockTileEntity(x, y, z));
 		}
 		return null;
+	}
+	
+	@Override
+	public void onConnect(NetworkManager network)
+	{
+	}
+
+	@Override
+	public void onLogin(NetworkManager network, Packet1Login login)
+	{
+			MessageManager.getInstance().registerChannel(network, this, "endgame.dialer");
+	}
+
+	@Override
+	public void onDisconnect(NetworkManager network, String message, Object[] args)
+	{
+	}
+
+	@Override
+	public void onPacketData(NetworkManager network, String channel, byte[] data)
+	{
+		if (channel.equals("endgame.dialer"))
+		{
+			EntityPlayer player = ((NetServerHandler)network.getNetHandler()).getPlayerEntity();
+			
+			int x, y, z, n;
+			DataInputStream ds = new DataInputStream(new ByteArrayInputStream(data));
+			try
+			{
+				x = ds.readInt();
+				y = ds.readInt();
+				z = ds.readInt();
+				n = ds.readInt();
+				
+				TileEntity ent = player.worldObj.getBlockTileEntity(x, y, z);
+				if (ent == null || !(ent instanceof TileEntityDialer)) return;
+				
+				((TileEntityDialer)ent).Dial(n);
+				
+				// String d = ((TileEntityDialer)ent).getDisplay();
+				
+				// Packet250CustomPayload packet = new Packet250CustomPayload();
+				
+				// ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+                // DataOutputStream dataout = new DataOutputStream(bytes);
+                // try
+                // {
+					// dataout.writeInt(
+					// dataout.writeInt(x);
+					// dataout.writeInt(y);
+					// dataout.writeInt(z);
+					// dataout.writeString(d);
+                // }
+                // catch(IOException e)
+                // {
+					// e.printStackTrace();
+                // }
+                // packet.channel = "endgame.dialer";
+                // packet.data = bytes.toByteArray();
+                // packet.length = packet.data.length;
+				
+				// ModLoader.getMinecraftServerInstance().configManager.sendPacketToAllPlayers(packet);
+			}
+			catch(Exception e)
+			{
+				e.printStackTrace();
+			}
+		}
 	}
 }

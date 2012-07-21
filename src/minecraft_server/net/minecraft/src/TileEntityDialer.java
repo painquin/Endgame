@@ -24,13 +24,25 @@ public class TileEntityDialer extends TileEntity
 		return Address;
 	}
 	
+	public void setDisplay(String d)
+	{
+		currentDisplay = d;
+	}
+	
 	public void Dial(int n)
 	{
+		if (worldObj.isRemote)
+		{
+			return;
+		}
+		
 		if (n == 10) // *
 		{
 			currentDisplay = "";
 			return;
 		}
+		
+		
 		
 		if (n == 11) // #
 		{
@@ -79,6 +91,8 @@ public class TileEntityDialer extends TileEntity
 		}
 		
 		currentDisplay += n;
+		
+		
 	}
 	
 	public String getDisplay()
