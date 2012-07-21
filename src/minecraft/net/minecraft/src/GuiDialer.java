@@ -27,7 +27,7 @@ public class GuiDialer extends GuiContainer
 		{
 			dialer.Dial(10);
 		}
-		else if (par1 == '#')
+		else if (par1 == '#' || par1 == 13)
 		{
 			dialer.Dial(11);
 		}

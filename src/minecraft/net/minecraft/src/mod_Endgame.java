@@ -9,15 +9,13 @@ public class mod_Endgame extends NetworkMod implements IGuiHandler
 {
 	public static mod_Endgame Instance;
 
-	public static Block NegastoneOre;
-	public static Block NegastoneOre_Nether;
-	
-	public static Item NegastoneDust;
-	public static Item SuperconductorDust;
-	public static Item SuperconductorIngot;
-	
+	public static BlockEndgameOre ModOre;
 	public static BlockGate Gate;
+	public static BlockGate GateActive;
+	
 	public static BlockDialer Dialer;
+	
+	public static ItemEndgame ModItems;
 	
 	@Override
 	public boolean clientSideRequired()
@@ -30,7 +28,7 @@ public class mod_Endgame extends NetworkMod implements IGuiHandler
 	{
 		return false;
 	}
-		
+	
 	public mod_Endgame()
 	{
 		Instance = this;
@@ -43,90 +41,69 @@ public class mod_Endgame extends NetworkMod implements IGuiHandler
 	
 		DisableNetherPortals();
 		
+		MinecraftForgeClient.preloadTexture("/Endgame/terrain.png");
+		MinecraftForgeClient.preloadTexture("/Endgame/items.png");
+		
+		ModItems = new ItemEndgame(20000);
+		ModItems.setItemName("endgame.items");
+		ModLoader.addName(ModItems, "Mod Item");
+		
 		//todo: combine into a single item, use meta info to distinguish
-		NegastoneDust = new Item(20000).setItemName("negastone.dust");
-		NegastoneDust.iconIndex = ModLoader.addOverride("/gui/items.png", "Endgame/dust.png");
-		ModLoader.addName(NegastoneDust, "Negastone Dust");
+		// NegastoneDust = new Item(20000).setItemName("negastone.dust");
+		// NegastoneDust.iconIndex = ModLoader.addOverride("/gui/items.png", "Endgame/dust.png");
+		// ModLoader.addName(NegastoneDust, "Negastone Dust");
 		
-		SuperconductorDust = new Item(20001).setItemName("superconductor.dust");
-		SuperconductorDust.iconIndex = ModLoader.addOverride("/gui/items.png", "Endgame/sdust.png");
-		ModLoader.addName(SuperconductorDust, "Superconductor Dust");
+		// SuperconductorDust = new Item(20001).setItemName("superconductor.dust");
+		// SuperconductorDust.iconIndex = ModLoader.addOverride("/gui/items.png", "Endgame/sdust.png");
+		// ModLoader.addName(SuperconductorDust, "Superconductor Dust");
 		
-		SuperconductorIngot = new Item(20002).setItemName("superconductor.ingot");
-		SuperconductorIngot.iconIndex = ModLoader.addOverride("/gui/items.png", "Endgame/ingot.png");
-		ModLoader.addName(SuperconductorIngot, "Superconductor Ingot");
+		// SuperconductorIngot = new Item(20002).setItemName("superconductor.ingot");
+		// SuperconductorIngot.iconIndex = ModLoader.addOverride("/gui/items.png", "Endgame/ingot.png");
+		// ModLoader.addName(SuperconductorIngot, "Superconductor Ingot");
 		
-		ModLoader.addSmelting(SuperconductorDust.shiftedIndex, new ItemStack(SuperconductorIngot, 1));
+		// ModLoader.addSmelting(SuperconductorDust.shiftedIndex, new ItemStack(SuperconductorIngot, 1));
 		
 		
 		Gate = new BlockGate(182);
 		Gate.setBlockName("endgame.gate")
 			.setHardness(3F)
 			.setResistance(25f)
-			.blockIndexInTexture = ModLoader.addOverride("/terrain.png", "Endgame/gate-off.png");
+			.setResistance(6000000.0F);
 		
 		ModLoader.addName(Gate, "Gate");
 		ModLoader.registerBlock(Gate);
+		
+		GateActive = new BlockGate(181)
+		{
+			public int getBlockTextureFromSideAndMetadata(int side, int metadata)
+			{
+				return super.getBlockTextureFromSideAndMetadata(side, metadata)+1;
+			}
+		};
+		
+		GateActive.setBlockName("endgame.gate.active")
+			.setBlockUnbreakable()
+			.setResistance(6000000.0F);
+		
+		ModLoader.registerBlock(GateActive);
 		
 		Dialer = new BlockDialer(183);
 		
 		Dialer.setBlockName("endgame.dialer")
 			.setHardness(3F)
-			.setResistance(15f)
-			.blockIndexInTexture = ModLoader.addOverride("/terrain.png", "Endgame/dialer.png");
+			.setResistance(6000000.0F);
+			
 		ModLoader.addName(Dialer, "Dialer");
 		ModLoader.registerBlock(Dialer);
 		
 		
 		// todo: combine into a single block, use meta info to distinguish
-		NegastoneOre = new Block(180, Material.rock)
-		{
-			/**
-			 * Returns the ID of the items to drop on destruction.
-			 */
-			public int idDropped(int par1, Random par2Random, int par3)
-			{
-				return NegastoneDust.shiftedIndex;
-			}
-
-			/**
-			 * Returns the usual quantity dropped by the block plus a bonus of 1 to 'i' (inclusive).
-			 */
-			public int quantityDroppedWithBonus(int par1, Random par2Random)
-			{
-				return quantityDropped(par2Random) + par2Random.nextInt(par1 + 1);
-			}
-
-			/**
-			 * Returns the quantity of items to drop on block destruction.
-			 */
-			public int quantityDropped(Random par1Random)
-			{
-				return 1;
-			}
-		};
+		ModOre = new BlockEndgameOre(180);
+		ModOre.setBlockName("endgame.ore");
+		ModLoader.registerBlock(ModOre);
+		ModLoader.addName(ModOre, "Mod Ore");
 		
-		NegastoneOre
-			.setBlockName("negastone.ore")
-			.setHardness(3F)
-			.setResistance(15f)
-			.blockIndexInTexture = ModLoader.addOverride("/terrain.png", "Endgame/ore.png");
-		
-		MinecraftForge.setBlockHarvestLevel(NegastoneOre, "pickaxe", 2);
-		ModLoader.addName(NegastoneOre, "Negastone Ore");
-		ModLoader.registerBlock(NegastoneOre);
-		
-		NegastoneOre_Nether = new Block(181, Material.rock);
-		
-		NegastoneOre_Nether
-			.setBlockName("negastonenether.ore")
-			.setHardness(2F)
-			.setResistance(10f)
-			.blockIndexInTexture = ModLoader.addOverride("/terrain.png", "Endgame/nore.png");
-		
-		MinecraftForge.setBlockHarvestLevel(NegastoneOre_Nether, "pickaxe", 1);
-		ModLoader.addName(NegastoneOre_Nether, "Negastone Ore");
-		ModLoader.registerBlock(NegastoneOre_Nether);
+		MinecraftForge.setBlockHarvestLevel(ModOre, "pickaxe", 2);
 		
 		ModLoader.registerTileEntity(TileEntityDialer.class, "Dialer");
 		
@@ -186,7 +163,7 @@ public class mod_Endgame extends NetworkMod implements IGuiHandler
 					v += p.ValueAt(x * 0.72F, y * 0.72F, z * 0.72F) * 0.25f;
 					if (v > 0.6F)
 					{
-						world.setBlock(x, y, z, NegastoneOre.blockID);
+						world.setBlockAndMetadata(x, y, z, ModOre.blockID, 0);
 					}
 				}
 			}
@@ -215,7 +192,7 @@ public class mod_Endgame extends NetworkMod implements IGuiHandler
 					v += p.ValueAt(x * 0.72F, y * 0.72F, z * 0.72F) * 0.25f;
 					if (v > (underLava ? 0.4F : 0.8F))
 					{
-						world.setBlock(x, y, z, NegastoneOre_Nether.blockID);
+						world.setBlockAndMetadata(x, y, z, ModOre.blockID, 1);
 					}
 				}
 			}
@@ -224,35 +201,34 @@ public class mod_Endgame extends NetworkMod implements IGuiHandler
 	
 	public void modsLoaded()
 	{
-		ModLoader.addShapelessRecipe(new ItemStack(SuperconductorDust, 1),
-			new Object[] { NegastoneDust, Items.getItem("goldDust").getItem() }
+		ModLoader.addShapelessRecipe(new ItemStack(ModItems, 1, 1),
+			new ItemStack(ModItems, 1, 0), Items.getItem("goldDust").getItem()
 		);
 
+		int energyCrystalId = ((IElectricItem)Items.getItem("energyCrystal").getItem()).getEmptyItemId();
+		
 		ModLoader.addRecipe(new ItemStack(Dialer, 1),
-			new Object[] {
-				"ESE", "SCS", "ESE",
-				'E', Items.getItem("energyCrystal"),
-				'S', SuperconductorIngot,
-				'C', Items.getItem("electronicCircuit")
-			}
+			"ESE", "SCS", "ESE",
+			'E', new ItemStack(energyCrystalId, 1, 26),
+			'S', new ItemStack(ModItems, 1, 2),
+			'C', Items.getItem("advancedCircuit")
 		);
 		
 		ModLoader.addRecipe(new ItemStack(Gate, 1),
 			new Object[] {
 				"ISI", "SCS", "ISI",
 				'I', Item.ingotIron,
-				'S', SuperconductorIngot,
+				'S', new ItemStack(ModItems, 1, 2),
 				'C', Items.getItem("electronicCircuit")
 			}
 		);
-		
-		Ic2Recipes.addMaceratorRecipe(new ItemStack(NegastoneOre_Nether), new ItemStack(NegastoneDust, 2));
-		
+				
 		// 8x charcoal to get a coal dust
 		Ic2Recipes.addMaceratorRecipe(new ItemStack(Item.coal, 8, 1), Items.getItem("coalDust"));
 		// compress netherrack into netherbricks - 4 resulted in 3 being used
 		Ic2Recipes.addCompressorRecipe(new ItemStack(Block.netherrack, 5), new ItemStack(Block.netherBrick, 1));
 		
+		FurnaceRecipes.smelting().addSmelting(ModItems.shiftedIndex, 1, new ItemStack(ModItems.shiftedIndex, 1, 2));
 	}
 	
 	public String getVersion()

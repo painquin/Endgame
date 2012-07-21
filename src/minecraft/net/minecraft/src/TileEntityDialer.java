@@ -4,9 +4,24 @@ package net.minecraft.src;
 public class TileEntityDialer extends TileEntity 
 {	
 	private String currentDisplay = "";
+	private String Address = "";
+	private String LastOutgoing = "";
+	private String LastIncoming = "";
+	
+	private boolean Active = false;
 	
 	public TileEntityDialer()
 	{
+		Address = "12345";
+	}
+	
+	public void setAddress(String address)
+	{
+		Address = address;
+	}
+	public String getAddress()
+	{
+		return Address;
 	}
 	
 	public void Dial(int n)
@@ -20,8 +35,46 @@ public class TileEntityDialer extends TileEntity
 		if (n == 11) // #
 		{
 			// behavior depends on input
-			
-			currentDisplay = "99999";
+			if (currentDisplay.equals("2")) currentDisplay = Address;
+			else if (currentDisplay.equals("3")) currentDisplay = LastIncoming;
+			else if (currentDisplay.equals("4")) currentDisplay = LastOutgoing;
+			else if (currentDisplay.equals("5"))
+			{
+				// activation test
+				currentDisplay = "";
+				int curMeta = worldObj.getBlockMetadata(xCoord, yCoord, zCoord);
+				worldObj.setBlockMetadata(xCoord, yCoord, zCoord, curMeta ^ 1);
+				worldObj.markBlockNeedsUpdate(xCoord, yCoord, zCoord);
+				boolean a = (curMeta & 1) == 0;
+				int removeId = (a ? mod_Endgame.Gate.blockID : mod_Endgame.GateActive.blockID);
+				int addId = (a ? mod_Endgame.GateActive.blockID : mod_Endgame.Gate.blockID);
+				if ((curMeta & 2) != 0)
+				{
+					for(int i = -2; i <= 2; ++i)
+					{
+						for(int j = 0; j < 5; ++j)
+						{
+							if (worldObj.getBlockId(xCoord, yCoord+j, zCoord+i) == removeId )
+							{
+								worldObj.setBlockAndMetadataWithNotify(xCoord, yCoord+j, zCoord+i, addId, 0);
+							}
+						}
+					}
+				}
+				else
+				{
+					for(int i = -2; i <= 2; ++i)
+					{
+						for(int j = 0; j < 5; ++j)
+						{
+							if (worldObj.getBlockId(xCoord+i, yCoord+j, zCoord) == removeId )
+							{
+								worldObj.setBlockAndMetadataWithNotify(xCoord+i, yCoord+j, zCoord, addId, 0);
+							}
+						}
+					}
+				}
+			}
 			return;
 		}
 		
