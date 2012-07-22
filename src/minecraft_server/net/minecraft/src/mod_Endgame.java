@@ -18,6 +18,10 @@ public class mod_Endgame extends NetworkMod implements IGuiHandler, IConnectionH
 	
 	public static ItemEndgame ModItems;
 	
+	protected ItemStack copperOre = null;
+	protected ItemStack tinOre = null;
+	protected ItemStack uraniumOre = null;
+	
 	@Override
 	public boolean clientSideRequired()
 	{
@@ -138,33 +142,118 @@ public class mod_Endgame extends NetworkMod implements IGuiHandler, IConnectionH
 	
 	
 	Perlin p = new Perlin(3);
+	Perlin mAlpha = new Perlin(7); // mountain alpha bonus
+	Perlin mBeta = new Perlin(9); // mountain beta bonus
+	
 	
 	public void generateSurface(World world, Random rand, int chunkX, int chunkZ)
 	{
 		int lavaId = Block.lavaStill.blockID;
 		
 		int maxHeight = world.getHeight();
-		
 		for(int x = chunkX; x < chunkX+16; ++x)
 		{
 			for(int z = chunkZ; z < chunkZ+16; ++z)
 			{
-				for(int y = 0; y < maxHeight; ++y)
+				int skyDepth = 0;
+				boolean sky = true;
+				
+				for(int y = maxHeight - 1; y > 0; --y)
 				{
-					// we only replace smoothstone with negastone
-					if (world.getBlockId(x,y,z) != Block.stone.blockID) continue;
+					int blockId = world.getBlockId(x, y, z);
 					
-					// and only under lava
-					int under = world.getBlockId(x,y+1,z);
-					if (under != Block.lavaStill.blockID && under != Block.lavaMoving.blockID) continue;
-						
-					// based on this 3D density map
-					float v = p.ValueAt(x * 0.312F, y * 0.312F, z * 0.312F) * 0.75F;
-					v += p.ValueAt(x * 0.72F, y * 0.72F, z * 0.72F) * 0.25f;
-					if (v > 0.6F)
+					if (sky)
 					{
-						world.setBlockAndMetadata(x, y, z, ModOre.blockID, 0);
+						if (blockId == 0)
+						{
+							++skyDepth;
+						}
+						else
+						{
+							sky = false;
+						}
 					}
+					
+					// we only replace smoothstone with valuables
+					if (blockId != Block.stone.blockID) continue;
+					
+					// negastone only under lava
+					int under = world.getBlockId(x,y+1,z);
+					float v;
+					if (under == Block.lavaStill.blockID || under == Block.lavaMoving.blockID)
+					{
+						// based on this 3D density map
+						v = p.ValueAt(x * 0.312F, y * 0.312F, z * 0.312F) * 0.75F;
+						v += p.ValueAt(x * 0.72F, y * 0.72F, z * 0.72F) * 0.25f;
+						if (v > 0.6F)
+						{
+							world.setBlockAndMetadata(x, y, z, ModOre.blockID, 0);
+							continue;
+						}
+					}
+					
+					
+					float bonus = (float)maxHeight / skyDepth;
+					
+					v = mAlpha.ValueAt(x * 0.53F, y * 0.73F, z * 0.53F) * 0.75F;
+					v += mBeta.ValueAt(x * 0.72F, y * 0.92F, z * 0.72F) * 0.3F;
+					
+					if (v * bonus > 1.2F)
+					{
+						world.setBlock(x, y, z, Block.oreIron.blockID);
+						continue;
+					}
+
+
+					if (copperOre != null)
+					{
+						v = mAlpha.ValueAt(x * 0.53F, y * -0.73F, z * 0.53F) * 0.75F;
+						v += mAlpha.ValueAt(x * -0.72F, y * -0.92F, z * -0.72F) * 0.3F;
+						
+						if (v * bonus > 1.3F)
+						{
+							world.setBlock(x, y, z, copperOre.itemID);
+							continue;
+						}
+					}
+					
+					
+					if (tinOre != null)
+					{
+						v = mAlpha.ValueAt(x * -0.53F, y * -0.73F, z * 0.53F) * 0.75F;
+						v += mAlpha.ValueAt(x * 0.72F, y * -0.92F, z * -0.72F) * 0.3F;
+						
+						if (v * bonus > 1.3F)
+						{
+							world.setBlock(x, y, z, tinOre.itemID);
+							continue;
+						}
+					}
+					
+					v = mBeta.ValueAt(x * 0.73F, y * 0.93F, z * 0.73F) * 0.75F;
+					v += mAlpha.ValueAt(x * 0.92F, y * 1.02F, z * 0.92F) * 0.3F;
+					
+					if (v * bonus > 1.4F)
+					{
+						world.setBlock(x, y, z, Block.oreGold.blockID);
+						continue;
+					}
+					
+					
+					
+					
+					if (uraniumOre != null)
+					{
+						v = mAlpha.ValueAt(x * -0.63F, y * -0.73F, z * 0.63F) * 0.75F;
+						v += mAlpha.ValueAt(x * 0.82F, y * -0.92F, z * -0.82F) * 0.3F;
+						
+						if (v * bonus > 1.5F)
+						{
+							world.setBlock(x, y, z, uraniumOre.itemID);
+							continue;
+						}
+					}
+					
 				}
 			}
 		}
@@ -201,6 +290,10 @@ public class mod_Endgame extends NetworkMod implements IGuiHandler, IConnectionH
 	
 	public void modsLoaded()
 	{
+		copperOre = Items.getItem("copperOre");
+		tinOre = Items.getItem("tinOre");
+		uraniumOre = Items.getItem("uraniumOre");
+		
 		ModLoader.addShapelessRecipe(new ItemStack(ModItems, 1, 1),
 			new ItemStack(ModItems, 1, 0), Items.getItem("goldDust").getItem()
 		);
