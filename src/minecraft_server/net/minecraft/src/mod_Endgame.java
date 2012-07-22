@@ -101,9 +101,9 @@ public class mod_Endgame extends NetworkMod implements IGuiHandler, IConnectionH
 		ModLoader.registerBlock(Dialer);
 		
 		
-		// todo: combine into a single block, use meta info to distinguish
 		ModOre = new BlockEndgameOre(180);
-		ModOre.setBlockName("endgame.ore");
+		ModOre.setBlockName("endgame.ore").setHardness(3.0F);
+		
 		ModLoader.registerBlock(ModOre);
 		ModLoader.addName(ModOre, "Mod Ore");
 		
