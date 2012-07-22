@@ -220,8 +220,8 @@ public class mod_Endgame extends NetworkMod implements IGuiHandler, IConnectionH
 					
 					if (tinOre != null)
 					{
-						v = mAlpha.ValueAt(x * -0.53F, y * -0.73F, z * 0.53F) * 0.75F;
-						v += mAlpha.ValueAt(x * 0.72F, y * -0.92F, z * -0.72F) * 0.3F;
+						v = mBeta.ValueAt(x * -0.53F, y * -0.73F, z * 0.53F) * 0.75F;
+						v += mBeta.ValueAt(x * 0.72F, y * -0.92F, z * -0.72F) * 0.3F;
 						
 						if (v * bonus > 1.3F)
 						{
@@ -239,7 +239,14 @@ public class mod_Endgame extends NetworkMod implements IGuiHandler, IConnectionH
 						continue;
 					}
 					
+					v = mBeta.ValueAt(x * -0.63F, y * -0.73F, z * -0.63F) * 0.75F;
+					v += mAlpha.ValueAt(x * 0.82F, y * -0.92F, z * -0.82F) * 0.3F;
 					
+					if (v * bonus > 1.15F)
+					{
+						world.setBlock(x, y, z, Block.oreCoal.blockID);
+						continue;
+					}
 					
 					
 					if (uraniumOre != null)
