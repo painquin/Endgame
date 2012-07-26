@@ -1,4 +1,4 @@
-package net.minecraft.src;
+/*package net.minecraft.src;
 import java.util.*;
 
 public class GateManager {
@@ -16,7 +16,6 @@ public class GateManager {
 	
 	private void unregisterGate(Gate gate){
 		//TODO: gate.ClosePortal();
-		
 	}
 
 	
@@ -118,4 +117,4 @@ public class GateManager {
 		System.out.println("Couldn't find space for a gate near " + xBase + ", " + zBase);
 		return null;
 	}	
-}
+}*/

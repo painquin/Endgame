@@ -29,6 +29,7 @@ public class BlockDialer extends BlockContainer implements ITextureProvider
 	/**
      * Returns the TileEntity used by this block.
      */
+	// This only ever really gets called once the TileEnitityDialer holds all the important info
     public TileEntity getBlockEntity()
     {
 		return new TileEntityDialer();
@@ -52,7 +53,20 @@ public class BlockDialer extends BlockContainer implements ITextureProvider
 		super.onBlockAdded(w, x, y, z);
 		
 		w.setBlockMetadata(x, y, z, calcMetadata(w, x, y, z));
+		TileEntityDialer d = (TileEntityDialer)w.getBlockTileEntity(x, y, z);
+		d.addedToWorld(w.getWorldInfo().getDimension(), x, y, z);
 	}
+	
+	    /**
+     * Called whenever the block is removed.
+     */
+	public void onBlockRemoval(World w, int x, int y, int z)
+    {
+        super.onBlockRemoval(w, x, y, z);
+		TileEntityDialer d = (TileEntityDialer)w.getBlockTileEntity(x, y, z);
+		d.removedFromWorld();
+        w.removeBlockTileEntity(x, y, z);
+    }
 	
 	public void onNeighborBlockChange(World w, int x, int y, int z, int id)
 	{
