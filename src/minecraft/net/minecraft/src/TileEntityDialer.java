@@ -60,7 +60,9 @@ public class TileEntityDialer extends TileEntity {
 		if (n == 11){ // #
 		
 			if(_currentDisplay.length() == 5){
-				
+				GateDialStatus status = _gate.tryToDial(_currentDisplay);
+				if(status == GateDialStatus.NoSuchGate) setDisplay("Invalid Gate Address");
+					
 			}
 			
 			// behavior depends on input

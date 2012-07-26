@@ -14,15 +14,13 @@ public class Gate {
 	public static Gate createGate(int dimension, int x, int y, int z){
 		Gate g = new Gate(randomAddress(), dimension, x, y, z);
 		_gates.put(g.getAddress(),g);
-		
 		return g;
 	}
+
 	private Gate(String address, int dimension, int x, int y, int z){
 		_address = address;
 		_dimension = dimension;
-		_x = x;
-		_y = y;
-		_z = z;
+		_chunkCoordinates = new ChunkCoordinates(x,y,z);
 		_lastIncoming = "12345";
 		_lastOutgoing = address;
 	}
@@ -44,30 +42,35 @@ public class Gate {
 	private String _lastIncoming;
 	private String _lastOutgoing;
 	
-	private int _x;
-	private int _y;
-	private int _z;
+	private ChunkCoordinates _chunkCoordinates;
 	private int _dimension;
 	private GateStatus _gateStatus;
 	
 	
 	public String getAddress(){ return _address;}
-	public int getX(){ return _x;}
-	public int getY(){ return _y;}
-	public int getZ(){ return _z;}
+	public ChunkCoordinates getChunkCoordinates(){ return _chunkCoordinates;}
+
 	public int getDimension(){ return _dimension;}
 	public String getLastIncoming(){ return _lastIncoming;}
 	public String getLastOutgoing(){ return _lastOutgoing;}
 	public GateStatus getGateStatus(){ return _gateStatus;}
 	
-	// determines if the gate has a ring and a dialer in the proper configuration
-	// TODO: once a gate structure is found, cache the positions of the blocks to make future
-	//       checks easier
-	public boolean hasGateStructure(/*World w*/){ return false;}
+	// // determines if the gate has a ring and a dialer in the proper configuration
+	// // TODO: once a gate structure is found, cache the positions of the blocks to make future
+	// //       checks easier
+	// public boolean hasGateStructure(/*World w*/){ return false;}
 	
 	public void unregister(){
 		// TODO: if this gate has an active incoming portal, close it or something
 		_gates.remove(_address);
 	}
 	
+	public GateDialStatus tryToDial(String address){
+		if(address.equals(_address))
+			return GateDialStatus.AddressIsSelf;
+		Gate target = find(address);
+		if(target == null)
+			return GateDialStatus.NoSuchGate;
+		return GateDialStatus.Success;
+	}
 }
